@@ -5,6 +5,20 @@ const Todo = props => {
                                      // and first index is having a function
     const [todoList, setTodoList] = useState([]);
 
+    // const [todoState, setTodoState] = useState({userInput: ' ', todoList: []});
+
+    // const inputChangeHandler = event =>{
+    //     setTodoState({
+    //         userInput:event.target.value,
+    //         todoList:todoState.todoList});
+    // };
+
+    // const todoAddHandler = () => {
+    //     setTodoState({
+    //         userInput:todoState.userInput,
+    //         todoList:todoState.todoList.concat(todoState.userInput)});
+    // }
+
     const inputChangeHandler = event =>{
         setTodoName(event.target.value);
     }
