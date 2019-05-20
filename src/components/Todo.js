@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 
 const Todo = props => {
@@ -19,6 +19,23 @@ const Todo = props => {
     //         userInput:todoState.userInput,
     //         todoList:todoState.todoList.concat(todoState.userInput)});
     // }
+
+
+    //useEffect we get triggered on every render of the component
+    // we pass [] then react will not look for any change of data in the component and useEffect will be called only once
+    // we pass the state whose change, useEffect should be called. in this case
+    // for every element change useEffect will be called.
+    useEffect(() => {
+        axios.get('https://test-a1537.firebaseio.com/todos.json').then(result => {
+            console.log(result);
+            const todoData = result.data;
+            const todo = [];
+            for(const key in todoData){
+                todo.push({id: key, name:todoData[key].name})
+            }
+            setTodoList(todo);
+        })
+    }, []);
 
     const inputChangeHandler = event =>{
         setTodoName(event.target.value);
@@ -45,7 +62,7 @@ const Todo = props => {
             >
                 Add</button>
             <ul>
-                {todoList.map(todo => <li key={todo}>{todo}</li>)}
+                {todoList.map(todo => <li key={todo.id}>{todo.name}</li>)}
             </ul>
         </React.Fragment>
     )
