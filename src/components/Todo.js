@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import axios from 'axios';
 
 const Todo = props => {
     const [todoName, setTodoName] = useState(''); //provide initial state value, this will return an array whose 0 index is having value
@@ -25,6 +26,9 @@ const Todo = props => {
 
     const todoAddHandler = () => {
         setTodoList(todoList.concat(todoName));
+        axios.post('https://test-a1537.firebaseio.com/todos.json',{name:todoName})
+            .then(res => console.log(res.data))
+            .catch(err => console.log(err));
     }
 
     return(
