@@ -6,6 +6,8 @@ const Todo = props => {
                                      // and first index is having a function
     const [todoList, setTodoList] = useState([]);
 
+    const [submittedTodo, setSubmittedTodo] = useState(null); // fix the delay problem
+
     // const [todoState, setTodoState] = useState({userInput: ' ', todoList: []});
 
     // const inputChangeHandler = event =>{
@@ -43,14 +45,25 @@ const Todo = props => {
         };
     }, []);
 
+    useEffect( () => {
+        if(submittedTodo){ // avoid error on first time execution
+            setTodoList(todoList.concat(submittedTodo))
+        }
+    },[submittedTodo])
+
     const inputChangeHandler = event =>{
         setTodoName(event.target.value);
     }
 
+    //problem: here when we add simultaneously 2 todos and assume backend takes little time then ui will reflect last added todo
+    //reason: as Addhandler function is clouser it holds the todolist will comprises of old values only hence thise issue.
     const todoAddHandler = () => {
-        setTodoList(todoList.concat(todoName));
         axios.post('https://test-a1537.firebaseio.com/todos.json',{name:todoName})
-            .then(res => console.log(res.data))
+            .then(res => {
+                const todoItem = {id: res.data.name, name: todoName}
+                //setTodoList(todoList.concat(todoItem));
+                setSubmittedTodo(todoItem);
+            })
             .catch(err => console.log(err));
     }
 
