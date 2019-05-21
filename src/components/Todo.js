@@ -34,7 +34,13 @@ const Todo = props => {
                 todo.push({id: key, name:todoData[key].name})
             }
             setTodoList(todo);
-        })
+        });
+
+        // return a callback function, this will trigger everytime useEffect gets applied.
+        // first react will execute this cleanup function then it will apply the useEffect hook.
+        return () => {
+            console.log('cleanup');
+        };
     }, []);
 
     const inputChangeHandler = event =>{
