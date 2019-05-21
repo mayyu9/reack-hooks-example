@@ -1,12 +1,27 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useReducer} from 'react';
 import axios from 'axios';
 
 const Todo = props => {
     const [todoName, setTodoName] = useState(''); //provide initial state value, this will return an array whose 0 index is having value
                                      // and first index is having a function
-    const [todoList, setTodoList] = useState([]);
+    //const [todoList, setTodoList] = useState([]);
 
-    const [submittedTodo, setSubmittedTodo] = useState(null); // fix the delay problem
+    //const [submittedTodo, setSubmittedTodo] = useState(null); // fix the delay problem
+
+    const todoReducer = (state, action) => {
+        switch(action.type){
+            case 'ADD':
+                return state.concat(action.payload);
+            case 'SET':
+                return action.payload;
+            case 'REMOVE':
+                return state.filter( (todo) => todo.id !== action.payload);
+            default:
+                return state;
+        }
+    };
+
+    const [todoList, dispatch] = useReducer(todoReducer, []);
 
     // const [todoState, setTodoState] = useState({userInput: ' ', todoList: []});
 
@@ -35,7 +50,8 @@ const Todo = props => {
             for(const key in todoData){
                 todo.push({id: key, name:todoData[key].name})
             }
-            setTodoList(todo);
+            //setTodoList(todo);
+            dispatch({type: 'SET', payload:todo});
         });
 
         // return a callback function, this will trigger everytime useEffect gets applied.
@@ -45,11 +61,12 @@ const Todo = props => {
         };
     }, []);
 
-    useEffect( () => {
-        if(submittedTodo){ // avoid error on first time execution
-            setTodoList(todoList.concat(submittedTodo))
-        }
-    },[submittedTodo])
+    // useEffect( () => {
+    //     if(submittedTodo){ // avoid error on first time execution
+    //         //setTodoList(todoList.concat(submittedTodo))
+    //         dispatch({type: 'ADD', payload:submittedTodo})
+    //     }
+    // },[submittedTodo])
 
     const inputChangeHandler = event =>{
         setTodoName(event.target.value);
@@ -62,9 +79,20 @@ const Todo = props => {
             .then(res => {
                 const todoItem = {id: res.data.name, name: todoName}
                 //setTodoList(todoList.concat(todoItem));
-                setSubmittedTodo(todoItem);
+                //setSubmittedTodo(todoItem);
+                dispatch({type: 'ADD', payload:todoItem});
             })
             .catch(err => console.log(err));
+    }
+
+    const removeHandler = (todoId) => {
+        axios.delete(`https://test-a1537.firebaseio.com/todos/${todoId}.json`)
+            .then(res => {
+                dispatch({type: 'REMOVE', payload:todoId})
+            })
+            .catch(err => {
+                console.log(err);
+            })
     }
 
     return(
@@ -81,7 +109,11 @@ const Todo = props => {
             >
                 Add</button>
             <ul>
-                {todoList.map(todo => <li key={todo.id}>{todo.name}</li>)}
+                {todoList.map(todo => 
+                    <li 
+                        key={todo.id}
+                        onClick={removeHandler.bind(this,todo.id)}
+                    >{todo.name}</li>)}
             </ul>
         </React.Fragment>
     )
