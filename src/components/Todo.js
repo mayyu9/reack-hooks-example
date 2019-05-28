@@ -1,6 +1,8 @@
 import React, {useState, useEffect, useReducer, useRef} from 'react';
 import axios from 'axios';
 
+import {useFormInput} from './hooks/Forms';
+
 const Todo = props => {
     //const [todoName, setTodoName] = useState(''); //provide initial state value, this will return an array whose 0 index is having value
                                      // and first index is having a function
@@ -9,6 +11,9 @@ const Todo = props => {
     //const [submittedTodo, setSubmittedTodo] = useState(null); // fix the delay problem
 
     const todoInputRef = useRef();
+
+    //custom hooks
+    const todoInput = useFormInput();
 
     const todoReducer = (state, action) => {
         switch(action.type){
@@ -77,7 +82,8 @@ const Todo = props => {
     //problem: here when we add simultaneously 2 todos and assume backend takes little time then ui will reflect last added todo
     //reason: as Addhandler function is clouser it holds the todolist will comprises of old values only hence thise issue.
     const todoAddHandler = () => {
-        const todoName = todoInputRef.current.value;
+        //const todoName = todoInputRef.current.value;
+        const todoName = todoInput.value;
         axios.post('https://test-a1537.firebaseio.com/todos.json',{name:todoName})
             .then(res => {
                 const todoItem = {id: res.data.name, name: todoName}
@@ -109,7 +115,10 @@ const Todo = props => {
              <input 
                 type="text" 
                 placeholder="Todo"
-                ref={todoInputRef}
+                // ref={todoInputRef}
+                value={todoInput.value}
+                onChange={todoInput.onChange}
+                style={{backgroundColor: todoInput.validity ? 'transparent': 'red'}}
             />
             <button 
                 type="button"
